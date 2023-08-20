@@ -11,11 +11,11 @@ use Filament\Support\Facades\FilamentIcon;
 use Filament\Support\Icons\Icon;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
+use Saade\FilamentAutograph\Commands\FilamentAutographCommand;
+use Saade\FilamentAutograph\Testing\TestsFilamentAutograph;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Saade\FilamentAutograph\Commands\FilamentAutographCommand;
-use Saade\FilamentAutograph\Testing\TestsFilamentAutograph;
 
 class FilamentAutographServiceProvider extends PackageServiceProvider
 {
