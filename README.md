@@ -1,7 +1,7 @@
 # Filament Autograph
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/saade/filament-adjacency-list.svg?style=flat-square)](https://packagist.org/packages/saade/filament-adjacency-list)
-[![Total Downloads](https://img.shields.io/packagist/dt/saade/filament-adjacency-list.svg?style=flat-square)](https://packagist.org/packages/saade/filament-adjacency-list)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/saade/filament-autograph.svg?style=flat-square)](https://packagist.org/packages/saade/filament-autograph)
+[![Total Downloads](https://img.shields.io/packagist/dt/saade/filament-autograph.svg?style=flat-square)](https://packagist.org/packages/saade/filament-autograph)
 
 <p align="center">
     <img src="art/cover.png" alt="Banner" style="width: 100%; max-width: 800px; border-radius: 10px" />
