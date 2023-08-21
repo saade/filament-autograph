@@ -49,6 +49,13 @@ trait HasActions
         return $action;
     }
 
+    public function clearAction(?Closure $callback): static
+    {
+        $this->modifyClearActionUsing = $callback;
+
+        return $this;
+    }
+
     public function getDownloadAction(): Action
     {
         $action = DownloadAction::make();
@@ -60,6 +67,13 @@ trait HasActions
         }
 
         return $action;
+    }
+
+    public function downloadAction(?Closure $callback): static
+    {
+        $this->modifyDownloadActionUsing = $callback;
+
+        return $this;
     }
 
     public function getUndoAction(): Action
@@ -80,6 +94,13 @@ trait HasActions
         return $action;
     }
 
+    public function undoAction(?Closure $callback): static
+    {
+        $this->modifyUndoActionUsing = $callback;
+
+        return $this;
+    }
+
     public function clearable(bool | Closure $condition = true): static
     {
         $this->isClearable = $condition;
@@ -87,13 +108,9 @@ trait HasActions
         return $this;
     }
 
-    public function downloadable(bool | Closure $condition = true, ?array $formats = null, string $dropdownPlacement = null): static
+    public function downloadable(bool | Closure $condition = true): static
     {
         $this->isDownloadable = $condition;
-
-        $this->downloadableFormats = $formats ?? $this->downloadableFormats;
-
-        $this->downloadActionDropdownPlacement = $dropdownPlacement;
 
         return $this;
     }
