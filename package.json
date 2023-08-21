@@ -21,6 +21,7 @@
         "postcss-import": "^15.1.0",
         "prettier": "^2.7.1",
         "prettier-plugin-tailwindcss": "^0.1.13",
+        "signature_pad": "^4.1.6",
         "tailwindcss": "^3.3.3"
     }
 }
