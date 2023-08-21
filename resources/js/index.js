@@ -3,6 +3,7 @@ import SignaturePad from "signature_pad";
 export default ({
     backgroundColor,
     backgroundColorOnDark,
+    confirmable,
     disabled,
     dotSize,
     exportBackgroundColor,
@@ -19,6 +20,8 @@ export default ({
 }) => ({
     state,
     previousState: state,
+    dirty: false,
+    confirmed: false,
 
     /** @type {SignaturePad} */
     signaturePad: null,
@@ -54,14 +57,42 @@ export default ({
 
     clear() {
         this.signaturePad.clear();
+        this.state = null;
+        this.confirmed = false;
+        this.dirty = false;
+        this.signaturePad.on();
     },
 
     undo() {
         const data = this.signaturePad.toData();
-        if (data) {
+        if (data.length) {
             data.pop();
             this.signaturePad.fromData(data);
         }
+
+        if (!data.length) {
+            this.state = null;
+        }
+
+        this.confirmed = false;
+        this.dirty = data.length > 0;
+        this.signaturePad.on();
+    },
+
+    done() {
+        const { data: exportedData, canvasBackgroundColor, canvasPenColor } = this.prepareToExport()
+        this.signaturePad.fromData(exportedData)
+
+        this.previousState = this.state;
+        this.state = this.signaturePad.toDataURL();
+
+        if (confirmable) {
+            this.confirmed = true;
+            this.signaturePad.off();
+        }
+
+        const { data: restoredData } = this.restoreFromExport(exportedData, canvasBackgroundColor, canvasPenColor)
+        this.signaturePad.fromData(restoredData)
     },
 
     downloadAs(type, extension) {
@@ -78,16 +109,21 @@ export default ({
     },
 
     watchState() {
-        this.signaturePad.addEventListener("afterUpdateStroke", (e) => {
-            const { data: exportedData, canvasBackgroundColor, canvasPenColor } = this.prepareToExport()
-            this.signaturePad.fromData(exportedData)
+        this.signaturePad.addEventListener("endStroke", (e) => {
+            this.dirty = true;
 
-            this.previousState = this.state;
-            this.state = this.signaturePad.toDataURL();
+            if (confirmable) {
+                return;
+            }
 
-            const { data: restoredData } = this.restoreFromExport(exportedData, canvasBackgroundColor, canvasPenColor)
-            this.signaturePad.fromData(restoredData)
+            this.done();
         }, { once: false });
+
+        this.$watch("confirmed", (confirmed) => {
+            if (confirmable && !confirmed) {
+                this.state = null
+            }
+        })
     },
 
     watchResize() {

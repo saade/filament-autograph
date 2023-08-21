@@ -20,10 +20,12 @@
         $downloadableFormats = $getDownloadableFormats();
         $downloadActionDropdownPlacement = $getDownloadActionDropdownPlacement() ?? 'bottom-start';
         $isUndoable = $isUndoable();
+        $isConfirmable = $isConfirmable();
         
         $clearAction = $getAction('clear');
         $downloadAction = $getAction('download');
         $undoAction = $getAction('undo');
+        $doneAction = $getAction('done');
     @endphp
 
     <div
@@ -33,6 +35,7 @@
         x-data="signaturePad({
             backgroundColor: @js($getBackgroundColor()),
             backgroundColorOnDark: @js($getBackgroundColorOnDark()),
+            confirmable: @js($isConfirmable),
             disabled: @js($isDisabled),
             dotSize: {{ $getDotSize() }},
             exportBackgroundColor: @js($getExportBackgroundColor()),
@@ -50,6 +53,7 @@
     >
         <canvas
             x-ref="canvas"
+            wire:ignore
             @class([
                 'w-full h-36 rounded-lg border border-gray-300',
                 'dark:bg-gray-900 dark:border-white/10',
@@ -98,6 +102,10 @@
                         @endif
                     </x-filament::dropdown.list>
                 </x-filament::dropdown>
+            @endif
+
+            @if ($isConfirmable)
+                {{ $doneAction }}
             @endif
         </div>
     </div>

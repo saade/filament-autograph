@@ -23,6 +23,7 @@ class SignaturePad extends Field
             fn (SignaturePad $component): Action => $component->getClearAction(),
             fn (SignaturePad $component): Action => $component->getDownloadAction(),
             fn (SignaturePad $component): Action => $component->getUndoAction(),
+            fn (SignaturePad $component): Action => $component->getDoneAction(),
         ]);
     }
 }

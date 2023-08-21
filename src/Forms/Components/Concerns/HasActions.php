@@ -4,7 +4,9 @@ namespace Saade\FilamentAutograph\Forms\Components\Concerns;
 
 use Closure;
 use Filament\Forms\Components\Actions\Action;
+use Illuminate\Support\HtmlString;
 use Saade\FilamentAutograph\Forms\Components\Actions\ClearAction;
+use Saade\FilamentAutograph\Forms\Components\Actions\DoneAction;
 use Saade\FilamentAutograph\Forms\Components\Actions\DownloadAction;
 use Saade\FilamentAutograph\Forms\Components\Actions\UndoAction;
 use Saade\FilamentAutograph\Forms\Components\Enums\DownloadableFormat;
@@ -25,11 +27,15 @@ trait HasActions
 
     protected bool | Closure $isUndoable = true;
 
+    protected bool | Closure $isConfirmable = false;
+
     protected ?Closure $modifyClearActionUsing = null;
 
     protected ?Closure $modifyDownloadActionUsing = null;
 
     protected ?Closure $modifyUndoActionUsing = null;
+
+    protected ?Closure $modifyDoneActionUsing = null;
 
     public function getClearAction(): Action
     {
@@ -101,6 +107,33 @@ trait HasActions
         return $this;
     }
 
+    public function getDoneAction(): Action
+    {
+        $action = DoneAction::make();
+
+        if ($this->modifyDoneActionUsing) {
+            $action = $this->evaluate($this->modifyDoneActionUsing, [
+                'action' => $action,
+            ]) ?? $action;
+        }
+
+        $action->extraAttributes([
+            'x-on:click' => 'done',
+            'x-cloak' => '',
+            'x-show' => new HtmlString('dirty && !confirmed'),
+            ...$action->getExtraAttributes(),
+        ]);
+
+        return $action;
+    }
+
+    public function doneAction(?Closure $callback): static
+    {
+        $this->modifyDoneActionUsing = $callback;
+
+        return $this;
+    }
+
     public function clearable(bool | Closure $condition = true): static
     {
         $this->isClearable = $condition;
@@ -132,6 +165,13 @@ trait HasActions
     public function undoable(bool | Closure $condition = true): static
     {
         $this->isUndoable = $condition;
+
+        return $this;
+    }
+
+    public function confirmable(bool | Closure $condition = true): static
+    {
+        $this->isConfirmable = $condition;
 
         return $this;
     }
@@ -171,5 +211,14 @@ trait HasActions
         }
 
         return (bool) $this->evaluate($this->isUndoable);
+    }
+
+    public function isConfirmable(): bool
+    {
+        if ($this->isDisabled()) {
+            return false;
+        }
+
+        return (bool) $this->evaluate($this->isConfirmable);
     }
 }

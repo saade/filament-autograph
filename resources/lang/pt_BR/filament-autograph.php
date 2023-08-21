@@ -19,5 +19,9 @@ return [
                 'svg' => 'SVG',
             ]
         ],
+
+        'done' => [
+            'label' => 'Concluir',
+        ],
     ]
 ];

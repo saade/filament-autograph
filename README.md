@@ -68,7 +68,7 @@ SignaturePad::make('signature')
     ->downloadActionDropdownPlacement('center-end')     // Dropdown placement of the download action (defaults to 'bottom-end')
 ```
 
-### Disabling clear, download and undo actions.
+### Disabling clear, download, undo and done actions.
 ```php
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 
@@ -76,6 +76,13 @@ SignaturePad::make('signature')
     ->clearable(false)
     ->downloadable(false)
     ->undoable(false)
+    ->confirmable(false)
+```
+
+### Requiring confirmation (Done button).
+```php
+SignaturePad::make('signature')
+    ->confirmable()                 // Requires user to click on 'Done' (defaults to false)
 ```
 
 ### Customizing actions
@@ -87,6 +94,7 @@ SignaturePad::make('signature')
     ->clearAction(fn (Action $action) => $action->button())
     ->downloadAction(fn (Action $action) => $action->color('primary'))
     ->undoAction(fn (Action $action) => $action->icon('heroicon-o-ctrl-z'))
+    ->confirmAction(fn (Action $action) => $action->iconButton()->icon('heroicon-o-thumbs-up'))
 ```
 ## Changelog
 
