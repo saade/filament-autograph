@@ -53,6 +53,7 @@
             @class([
                 'w-full h-36 rounded-lg border border-gray-300',
                 'dark:bg-gray-900 dark:border-white/10',
+                'opacity-75 bg-gray-50' => $isDisabled,
             ])
         ></canvas>
 
