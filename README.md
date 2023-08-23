@@ -4,7 +4,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/saade/filament-autograph.svg?style=flat-square)](https://packagist.org/packages/saade/filament-autograph)
 
 <p align="center">
-    <img src="art/cover.png" alt="Banner" style="width: 100%; max-width: 800px; border-radius: 10px" />
+    <img src="https://raw.githubusercontent.com/saade/filament-autograph/3.x/art/cover.png" alt="Banner" style="width: 100%; max-width: 800px; border-radius: 10px" />
 </p>
 
 ## Installation
@@ -120,6 +120,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 <br><br>
 <p align="center">
     <a href="https://github.com/sponsors/saade">
-        <img src="art/sponsor.png" alt="Sponsor Saade" style="width: 100%; max-width: 800px;" />
+        <img src="https://raw.githubusercontent.com/saade/filament-autograph/3.x/art/sponsor.png" alt="Sponsor Saade" style="width: 100%; max-width: 800px;" />
     </a>
 </p>
