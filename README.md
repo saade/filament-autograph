@@ -94,7 +94,7 @@ SignaturePad::make('signature')
     ->clearAction(fn (Action $action) => $action->button())
     ->downloadAction(fn (Action $action) => $action->color('primary'))
     ->undoAction(fn (Action $action) => $action->icon('heroicon-o-ctrl-z'))
-    ->confirmAction(fn (Action $action) => $action->iconButton()->icon('heroicon-o-thumbs-up'))
+    ->doneAction(fn (Action $action) => $action->iconButton()->icon('heroicon-o-thumbs-up'))
 ```
 ## Changelog
 
