@@ -29,7 +29,7 @@
     @endphp
 
     <div
-        ax-load
+        ax-load="visible"
         ax-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-autograph', 'saade/filament-autograph') }}"
         ax-load-css="{{ \Filament\Support\Facades\FilamentAsset::getStyleHref('filament-autograph-styles', 'saade/filament-autograph') }}"
         x-data="signaturePad({
