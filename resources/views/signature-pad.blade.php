@@ -2,17 +2,9 @@
     use Saade\FilamentAutograph\Forms\Components\Enums\DownloadableFormat;
 @endphp
 
-<x-filament-forms::field-wrapper
-    class="filament-autograph"
-    :id="$getId()"
-    :label="$getLabel()"
-    :label-sr-only="$isLabelHidden()"
-    :helper-text="$getHelperText()"
-    :hint="$getHint()"
-    :hint-color="$getHintColor()"
-    :hint-icon="$getHintIcon()"
-    :required="$isRequired()"
-    :state-path="$getStatePath()"
+<x-dynamic-component
+    :component="$getFieldWrapperView()"
+    :field="$field"
 >
     @php
         $isDisabled = $isDisabled();
@@ -110,4 +102,4 @@
             @endif
         </div>
     </div>
-</x-filament-forms::field-wrapper>
+</x-dynamic-component>
