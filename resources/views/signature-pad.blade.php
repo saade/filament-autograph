@@ -1,4 +1,5 @@
 @php
+    use Filament\Support\Facades\FilamentView;
     use Saade\FilamentAutograph\Forms\Components\Enums\DownloadableFormat;
 @endphp
 
@@ -15,7 +16,7 @@
         $isUndoable = $isUndoable();
         $isConfirmable = $isConfirmable();
         $loadStrategy = $getLoadStrategy();
-        
+
         $clearAction = $getAction('clear');
         $downloadAction = $getAction('download');
         $undoAction = $getAction('undo');
@@ -23,10 +24,13 @@
     @endphp
 
     <div
-        ax-load="{{ $getLoadStrategy() }}"
-        ax-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-autograph', 'saade/filament-autograph') }}"
-        ax-load-css="{{ \Filament\Support\Facades\FilamentAsset::getStyleHref('filament-autograph-styles', 'saade/filament-autograph') }}"
-        x-data="signaturePad({
+        @if (FilamentView::hasSpaMode())
+            {{-- format-ignore-start --}}x-load="visible || event (ax-modal-opened)"{{-- format-ignore-end --}}
+        @else
+            x-load
+        @endif
+        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-autograph', 'saade/filament-autograph') }}"
+        x-data="signaturePadFormComponent({
             backgroundColor: @js($getBackgroundColor()),
             backgroundColorOnDark: @js($getBackgroundColorOnDark()),
             confirmable: @js($isConfirmable),
@@ -44,6 +48,8 @@
             throttle: {{ $getThrottle() }},
             velocityFilterWeight: {{ $getVelocityFilterWeight() }},
         })"
+        x-init="$nextTick(() => { setTimeout(() => { initSignaturePad() }, 200) })"
+        x-bind="eventListeners"
     >
         <canvas
             x-ref="canvas"
