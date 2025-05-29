@@ -35,7 +35,7 @@ trait HasOptions
 
     protected string | Closure $loadStrategy = 'visible';
 
-    protected DownloadableFormat | null $stateFormat;
+    protected DownloadableFormat | null $stateFormat = null;
 
     /**
      * Filename of the downloaded image. Without extension.
