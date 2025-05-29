@@ -3,6 +3,7 @@
 namespace Saade\FilamentAutograph\Forms\Components\Concerns;
 
 use Closure;
+use Saade\FilamentAutograph\Forms\Components\Enums\DownloadableFormat;
 
 trait HasOptions
 {
@@ -33,6 +34,8 @@ trait HasOptions
     protected float | Closure $velocityFilterWeight = 0.7;
 
     protected string | Closure $loadStrategy = 'visible';
+
+    protected DownloadableFormat | null $stateFormat;
 
     /**
      * Filename of the downloaded image. Without extension.
@@ -181,6 +184,16 @@ trait HasOptions
         return $this;
     }
 
+    /**
+     * Used to set the format e.g. (PNG, SVG) that will be passed back to the Filament state.
+     */
+    public function stateFormat(DownloadableFormat $downloadableFormat): static
+    {
+        $this->stateFormat = $downloadableFormat;
+
+        return $this;
+    }
+
     public function getDotSize(): float
     {
         return $this->evaluate($this->dotSize);
@@ -244,5 +257,10 @@ trait HasOptions
     public function getLoadStrategy(): string
     {
         return $this->evaluate($this->loadStrategy);
+    }
+
+    public function getStateFormat(): ?string
+    {
+        return $this->evaluate($this->stateFormat?->getMime());
     }
 }

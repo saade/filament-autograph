@@ -15,6 +15,7 @@ export default ({
     penColor,
     penColorOnDark,
     state,
+    stateFormat,
     throttle,
     velocityFilterWeight,
 }) => ({
@@ -84,7 +85,7 @@ export default ({
         this.signaturePad.fromData(exportedData)
 
         this.previousState = this.state;
-        this.state = this.signaturePad.toDataURL();
+        this.state = this.signaturePad.toDataURL(stateFormat);
 
         if (confirmable) {
             this.confirmed = true;

@@ -15,7 +15,8 @@
         $isUndoable = $isUndoable();
         $isConfirmable = $isConfirmable();
         $loadStrategy = $getLoadStrategy();
-        
+        $stateFormat = $getStateFormat();
+
         $clearAction = $getAction('clear');
         $downloadAction = $getAction('download');
         $undoAction = $getAction('undo');
@@ -41,6 +42,7 @@
             penColor: @js($getPenColor()),
             penColorOnDark: @js($getPenColorOnDark()),
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$getStatePath()}')") }},
+            stateFormat: '{{ $stateFormat }}',
             throttle: {{ $getThrottle() }},
             velocityFilterWeight: {{ $getVelocityFilterWeight() }},
         })"
