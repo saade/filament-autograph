@@ -2,9 +2,9 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev:styles": "npx tailwindcss -i resources/css/index.css -o resources/dist/filament-autograph.css --postcss --watch",
+        "dev:styles": "npx @tailwindcss/cli -i resources/css/index.css -o resources/dist/filament-autograph.css --postcss --watch",
         "dev:scripts": "node bin/build.js --dev",
-        "build:styles": "npx tailwindcss -i resources/css/index.css -o resources/dist/filament-autograph.css --postcss --minify && npm run purge",
+        "build:styles": "npx @tailwindcss/cli -i resources/css/index.css -o resources/dist/filament-autograph.css --postcss --minify && npm run purge",
         "build:scripts": "node bin/build.js",
         "purge": "filament-purge -i resources/dist/filament-autograph.css -o resources/dist/filament-autograph.css -v 3.x",
         "dev": "npm-run-all --parallel dev:*",
@@ -22,6 +22,6 @@
         "prettier": "^2.7.1",
         "prettier-plugin-tailwindcss": "^0.1.13",
         "signature_pad": "^5.0.7",
-        "tailwindcss": "^3.3.3"
+        "tailwindcss": "^4.0"
     }
 }
