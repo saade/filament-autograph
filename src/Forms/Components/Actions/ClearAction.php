@@ -2,7 +2,7 @@
 
 namespace Saade\FilamentAutograph\Forms\Components\Actions;
 
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Support\Enums\ActionSize;
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 

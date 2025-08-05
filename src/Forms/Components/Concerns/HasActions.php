@@ -3,7 +3,7 @@
 namespace Saade\FilamentAutograph\Forms\Components\Concerns;
 
 use Closure;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
 use Illuminate\Support\HtmlString;
 use Saade\FilamentAutograph\Forms\Components\Actions\ClearAction;
 use Saade\FilamentAutograph\Forms\Components\Actions\DoneAction;

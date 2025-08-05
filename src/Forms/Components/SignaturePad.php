@@ -3,7 +3,7 @@
 namespace Saade\FilamentAutograph\Forms\Components;
 
 use Closure;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Field;
 use Saade\FilamentAutograph\Forms\Components\Concerns\HasActions;
 use Saade\FilamentAutograph\Forms\Components\Concerns\HasOptions;
