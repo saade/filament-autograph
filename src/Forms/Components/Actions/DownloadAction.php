@@ -3,7 +3,7 @@
 namespace Saade\FilamentAutograph\Forms\Components\Actions;
 
 use Filament\Actions\Action;
-use Filament\Support\Enums\ActionSize;
+use Filament\Support\Enums\Size;
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 
 class DownloadAction extends Action
@@ -23,7 +23,7 @@ class DownloadAction extends Action
 
         $this->livewireClickHandlerEnabled(false);
 
-        $this->size(ActionSize::Small);
+        $this->size(Size::Small);
 
         $this->visible(
             fn (SignaturePad $component): bool => $component->isDownloadable()
