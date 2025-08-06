@@ -2,8 +2,8 @@
 
 namespace Saade\FilamentAutograph\Forms\Components\Actions;
 
-use Filament\Forms\Components\Actions\Action;
-use Filament\Support\Enums\ActionSize;
+use Filament\Actions\Action;
+use Filament\Support\Enums\Size;
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 
 class DoneAction extends Action
@@ -23,7 +23,7 @@ class DoneAction extends Action
 
         $this->livewireClickHandlerEnabled(false);
 
-        $this->size(ActionSize::Small);
+        $this->size(Size::Small);
 
         $this->visible(
             fn (SignaturePad $component): bool => $component->isConfirmable()
