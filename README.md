@@ -9,10 +9,20 @@
 
 ## Installation
 
-You can install the package via composer:
+#### 1. You can install the package via composer:
 
 ```bash
 composer require saade/filament-autograph
+```
+
+#### 2. Setup the plugin styles:
+> [!IMPORTANT]
+> If you have not set up a custom theme and are using Filament Panels follow the instructions in the [Filament Docs](https://filamentphp.com/docs/4.x/styling/overview#creating-a-custom-theme) first.
+
+After setting up a custom theme add the plugin's views to your theme css file or your app's css file if using the standalone packages.
+
+```css
+@source '../../../../vendor/saade/filament-autograph/resources/views/**/*.blade.php';
 ```
 
 ## Usage

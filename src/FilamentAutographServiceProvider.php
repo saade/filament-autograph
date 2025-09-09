@@ -18,25 +18,13 @@ class FilamentAutographServiceProvider extends PackageServiceProvider
 
     public function configurePackage(Package $package): void
     {
-        $package->name(static::$name)
+        $package
+            ->name(static::$name)
+            ->hasTranslations()
+            ->hasViews(static::$viewNamespace)
             ->hasInstallCommand(function (InstallCommand $command) {
-                $command
-                    ->askToStarRepoOnGitHub('saade/filament-autograph');
+                $command->askToStarRepoOnGitHub('saade/filament-autograph');
             });
-
-        $configFileName = $package->shortName();
-
-        if (file_exists($package->basePath('/../resources/lang'))) {
-            $package->hasTranslations();
-        }
-
-        if (file_exists($package->basePath('/../resources/views'))) {
-            $package->hasViews(static::$viewNamespace);
-        }
-    }
-
-    public function packageRegistered(): void
-    {
     }
 
     public function packageBooted(): void
@@ -58,14 +46,8 @@ class FilamentAutographServiceProvider extends PackageServiceProvider
      */
     protected function getAssets(): array
     {
-        $assets = [
+        return [
             AlpineComponent::make('filament-autograph', __DIR__ . '/../resources/dist/filament-autograph.js'),
         ];
-
-        if (config('filament-autograph.filament_autograph_styles_enabled', true)) {
-            $assets[] = Css::make('filament-autograph-styles', __DIR__ . '/../resources/dist/filament-autograph.css');
-        }
-
-        return $assets;
     }
 }
