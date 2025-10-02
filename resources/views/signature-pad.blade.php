@@ -24,12 +24,8 @@
     @endphp
 
     <div
-        @if (FilamentView::hasSpaMode())
-            {{-- format-ignore-start --}}x-load="visible || event (ax-modal-opened)"{{-- format-ignore-end --}}
-        @else
-            x-load
-        @endif
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-autograph', 'saade/filament-autograph') }}"
+        x-load="visible || event (ax-modal-opened)"
+        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-autograph-alpine', 'saade/filament-autograph') }}"
         x-data="signaturePadFormComponent({
             backgroundColor: @js($getBackgroundColor()),
             backgroundColorOnDark: @js($getBackgroundColorOnDark()),
@@ -48,8 +44,6 @@
             throttle: {{ $getThrottle() }},
             velocityFilterWeight: {{ $getVelocityFilterWeight() }},
         })"
-        x-init="$nextTick(() => { setTimeout(() => { initSignaturePad() }, 200) })"
-        x-bind="eventListeners"
     >
         <canvas
             x-ref="canvas"
@@ -61,7 +55,7 @@
             ])
         ></canvas>
 
-        <div class="flex items-center justify-end m-1 space-x-2">
+        <div class="flex items-center justify-end mt-3 space-x-2">
             @if ($isClearable)
                 {{ $clearAction }}
             @endif
