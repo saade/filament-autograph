@@ -4,7 +4,6 @@ namespace Saade\FilamentAutograph;
 
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
-use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -47,7 +46,7 @@ class FilamentAutographServiceProvider extends PackageServiceProvider
     protected function getAssets(): array
     {
         return [
-            AlpineComponent::make('filament-autograph', __DIR__ . '/../resources/dist/filament-autograph.js'),
+            AlpineComponent::make('filament-autograph-alpine', __DIR__.'/../resources/dist/filament-autograph.js'),
         ];
     }
 }
