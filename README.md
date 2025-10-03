@@ -52,6 +52,14 @@ SignaturePad::make('signature')
     ->exportPenColor('#0f0')            // Pen color on export (defaults to penColor)
 ```
 
+### Customizing the data format passed back to Filament state
+```php
+use Saade\FilamentAutograph\Forms\Components\SignaturePad;
+
+SignaturePad::make('signature')
+    ->stateFormat(DownloadableFormat::SVG) #All options return a data url of the base 64 encoded download type The default value is a JPEG.
+```
+
 ### Allow download of the signature.
 ```php
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
