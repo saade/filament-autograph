@@ -46,7 +46,7 @@ class FilamentAutographServiceProvider extends PackageServiceProvider
     protected function getAssets(): array
     {
         return [
-            AlpineComponent::make('filament-autograph-alpine', __DIR__.'/../resources/dist/filament-autograph.js'),
+            AlpineComponent::make('filament-autograph-alpine', __DIR__ . '/../resources/dist/filament-autograph.js'),
         ];
     }
 }
