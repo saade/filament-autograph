@@ -24,7 +24,7 @@
     @endphp
 
     <div
-        x-load="visible || event (ax-modal-opened)"
+        x-load="visible || idle"
         x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-autograph-alpine', 'saade/filament-autograph') }}"
         x-data="signaturePadFormComponent({
             backgroundColor: @js($getBackgroundColor()),
@@ -44,6 +44,30 @@
             throttle: {{ $getThrottle() }},
             velocityFilterWeight: {{ $getVelocityFilterWeight() }},
         })"
+
+        x-init="
+            $nextTick(() => {
+                const canvas = $refs.canvas
+
+                const sync = () => {
+                    const ratio = Math.max(window.devicePixelRatio || 1, 1)
+
+                    if (! canvas.offsetWidth || canvas.width === canvas.offsetWidth * ratio) {
+                        return
+                    }
+
+                    resizeCanvas()
+
+                    if (state) {
+                        signaturePad.fromDataURL(state)
+                    }
+                }
+
+                sync()
+
+                new ResizeObserver(sync).observe(canvas)
+            })
+        "
     >
         <canvas
             x-ref="canvas"
