@@ -1,4 +1,4 @@
-import SignaturePad from "signature_pad";
+import SignaturePad from 'signature_pad'
 
 export default function signaturePadFormComponent({
     backgroundColor,
@@ -27,7 +27,7 @@ export default function signaturePadFormComponent({
         /** @type {SignaturePad} */
         signaturePad: null,
 
-        initSignaturePad() {
+        init() {
             this.signaturePad = new SignaturePad(this.$refs.canvas, {
                 backgroundColor,
                 dotSize,
@@ -43,84 +43,110 @@ export default function signaturePadFormComponent({
                 this.signaturePad.off()
             }
 
-            this.watchState();
-            this.watchResize();
-            this.watchTheme();
+            this.watchState()
+            this.watchResize()
+            this.watchTheme()
 
             if (state.initialValue) {
-                this.signaturePad.fromDataURL(state.initialValue);
+                this.signaturePad.fromDataURL(state.initialValue)
 
-                this.signaturePad.addEventListener("beginStroke", () => {
-                    this.signaturePad.clear();
-                }, { once: true });
+                this.signaturePad.addEventListener(
+                    'beginStroke',
+                    () => {
+                        this.signaturePad.clear()
+                    },
+                    { once: true },
+                )
             }
         },
 
         clear() {
-            this.signaturePad.clear();
-            this.state = null;
-            this.confirmed = false;
-            this.dirty = false;
-            this.signaturePad.on();
+            this.signaturePad.clear()
+            this.state = null
+            this.confirmed = false
+            this.dirty = false
+            this.signaturePad.on()
         },
 
         undo() {
-            const data = this.signaturePad.toData();
+            const data = this.signaturePad.toData()
             if (data.length) {
-                data.pop();
-                this.signaturePad.fromData(data);
+                data.pop()
+                this.signaturePad.fromData(data)
             }
 
             if (!data.length) {
-                this.state = null;
+                this.state = null
             }
 
-            this.confirmed = false;
-            this.dirty = data.length > 0;
-            this.signaturePad.on();
+            this.confirmed = false
+            this.dirty = data.length > 0
+            this.signaturePad.on()
         },
 
         done() {
-            const { data: exportedData, canvasBackgroundColor, canvasPenColor } = this.prepareToExport()
+            const {
+                data: exportedData,
+                canvasBackgroundColor,
+                canvasPenColor,
+            } = this.prepareToExport()
             this.signaturePad.fromData(exportedData)
 
-            this.previousState = this.state;
-            this.state = this.signaturePad.toDataURL();
+            this.previousState = this.state
+            this.state = this.signaturePad.toDataURL()
 
             if (confirmable) {
-                this.confirmed = true;
-                this.signaturePad.off();
+                this.confirmed = true
+                this.signaturePad.off()
             }
 
-            const { data: restoredData } = this.restoreFromExport(exportedData, canvasBackgroundColor, canvasPenColor)
+            const { data: restoredData } = this.restoreFromExport(
+                exportedData,
+                canvasBackgroundColor,
+                canvasPenColor,
+            )
             this.signaturePad.fromData(restoredData)
         },
 
         downloadAs(type, extension) {
-            const { data: exportedData, canvasBackgroundColor, canvasPenColor } = this.prepareToExport()
+            const {
+                data: exportedData,
+                canvasBackgroundColor,
+                canvasPenColor,
+            } = this.prepareToExport()
             this.signaturePad.fromData(exportedData)
 
             this.download(
-                this.signaturePad.toDataURL(type, { includeBackgroundColor: true }),
-                `${filename}.${extension}`
+                this.signaturePad.toDataURL(type, {
+                    includeBackgroundColor: true,
+                }),
+                `${filename}.${extension}`,
             )
 
-            const { data: restoredData } = this.restoreFromExport(exportedData, canvasBackgroundColor, canvasPenColor)
+            const { data: restoredData } = this.restoreFromExport(
+                exportedData,
+                canvasBackgroundColor,
+                canvasPenColor,
+            )
             this.signaturePad.fromData(restoredData)
         },
 
         watchState() {
-            this.signaturePad.addEventListener("endStroke", (e) => {
-                this.dirty = true;
+            this.signaturePad.addEventListener(
+                'endStroke',
+                (e) => {
+                    this.dirty = true
 
-                if (confirmable) {
-                    return;
-                }
+                    if (confirmable) {
+                        return
+                    }
 
-                this.done();
-            }, { once: false });
+                    this.done()
+                },
+                { once: false },
+            )
 
-            this.$watch("confirmed", (confirmed) => {
+            this.$watch('confirmed', (confirmed) => {
                 if (confirmable && !confirmed) {
                     this.state = null
                 }
@@ -128,35 +154,42 @@ export default function signaturePadFormComponent({
         },
 
         watchResize() {
-            window.addEventListener("resize", () => this.resizeCanvas);
-            this.resizeCanvas();
+            window.addEventListener('resize', () => this.resizeCanvas)
+            this.resizeCanvas()
         },
 
         /**
          * To correctly handle canvas on low and high DPI screens one has to take devicePixelRatio into account and scale the canvas accordingly.
          */
         resizeCanvas() {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const ratio = Math.max(window.devicePixelRatio || 1, 1)
 
-            this.$refs.canvas.width = this.$refs.canvas.offsetWidth * ratio;
-            this.$refs.canvas.height = this.$refs.canvas.offsetHeight * ratio;
-            this.$refs.canvas.getContext("2d").scale(ratio, ratio);
-            this.signaturePad.clear();
+            this.$refs.canvas.width = this.$refs.canvas.offsetWidth * ratio
+            this.$refs.canvas.height = this.$refs.canvas.offsetHeight * ratio
+            this.$refs.canvas.getContext('2d').scale(ratio, ratio)
+            this.signaturePad.clear()
         },
 
         watchTheme() {
-            let theme;
+            let theme
 
             if (this.$store.hasOwnProperty('theme')) {
-                window.addEventListener('theme-changed', e => this.onThemeChanged(e.detail))
+                window.addEventListener('theme-changed', (e) =>
+                    this.onThemeChanged(e.detail),
+                )
 
                 theme = this.$store.theme
             } else {
                 window
                     .matchMedia('(prefers-color-scheme: dark)')
-                    .addEventListener('change', e => this.onThemeChanged(e.matches ? 'dark' : 'light'))
+                    .addEventListener('change', (e) =>
+                        this.onThemeChanged(e.matches ? 'dark' : 'light'),
+                    )
 
-                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+                theme = window.matchMedia('(prefers-color-scheme: dark)')
+                    .matches
+                    ? 'dark'
+                    : 'light'
             }
 
             this.onThemeChanged(theme)
@@ -167,8 +200,12 @@ export default function signaturePadFormComponent({
          * @param {'dark'|'light'} theme
          */
         onThemeChanged(theme) {
-            this.signaturePad.penColor = theme === 'dark' ? penColorOnDark ?? penColor : penColor
-            this.signaturePad.backgroundColor = theme === 'dark' ? backgroundColorOnDark ?? backgroundColor : backgroundColor
+            this.signaturePad.penColor =
+                theme === 'dark' ? penColorOnDark ?? penColor : penColor
+            this.signaturePad.backgroundColor =
+                theme === 'dark'
+                    ? backgroundColorOnDark ?? backgroundColor
+                    : backgroundColor
 
             if (!this.signaturePad.toData().length) {
                 return
@@ -176,9 +213,13 @@ export default function signaturePadFormComponent({
 
             // Repaint the signature pad with the new colors
             const data = this.signaturePad.toData()
-            data.map(d => {
-                d.penColor = theme === 'dark' ? penColorOnDark ?? penColor : penColor
-                d.backgroundColor = theme === 'dark' ? backgroundColorOnDark ?? backgroundColor : backgroundColor
+            data.map((d) => {
+                d.penColor =
+                    theme === 'dark' ? penColorOnDark ?? penColor : penColor
+                d.backgroundColor =
+                    theme === 'dark'
+                        ? backgroundColorOnDark ?? backgroundColor
+                        : backgroundColor
                 return d
             })
             this.signaturePad.clear()
@@ -192,8 +233,9 @@ export default function signaturePadFormComponent({
             const canvasPenColor = this.signaturePad.penColor
 
             // Set export colors
-            this.signaturePad.backgroundColor = exportBackgroundColor ?? this.signaturePad.backgroundColor
-            data.map(d => d.penColor = exportPenColor ?? d.penColor)
+            this.signaturePad.backgroundColor =
+                exportBackgroundColor ?? this.signaturePad.backgroundColor
+            data.map((d) => (d.penColor = exportPenColor ?? d.penColor))
 
             return {
                 data,
@@ -205,7 +247,7 @@ export default function signaturePadFormComponent({
         restoreFromExport(data, canvasBackgroundColor, canvasPenColor) {
             // Restore previous data
             this.signaturePad.backgroundColor = canvasBackgroundColor
-            data.map(d => d.penColor = canvasPenColor)
+            data.map((d) => (d.penColor = canvasPenColor))
 
             return {
                 data,
@@ -213,19 +255,13 @@ export default function signaturePadFormComponent({
         },
 
         download(data, filename) {
-            const link = document.createElement('a');
+            const link = document.createElement('a')
 
-            link.download = filename;
-            link.href = data;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.download = filename
+            link.href = data
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
         },
-
-        eventListeners: {
-            ['@reload-signature-component.window'](event) {
-                this.initSignaturePad();
-            }
-        }
     }
 }

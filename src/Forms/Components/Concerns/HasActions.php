@@ -13,21 +13,21 @@ use Saade\FilamentAutograph\Forms\Components\Enums\DownloadableFormat;
 
 trait HasActions
 {
-    protected bool | Closure $isClearable = true;
+    protected bool|Closure $isClearable = true;
 
-    protected bool | Closure $isDownloadable = false;
+    protected bool|Closure $isDownloadable = false;
 
-    protected array | Closure $downloadableFormats = [
+    protected array|Closure $downloadableFormats = [
         DownloadableFormat::PNG,
         DownloadableFormat::JPG,
         DownloadableFormat::SVG,
     ];
 
-    protected string | Closure | null $downloadActionDropdownPlacement = null;
+    protected string|Closure|null $downloadActionDropdownPlacement = null;
 
-    protected bool | Closure $isUndoable = true;
+    protected bool|Closure $isUndoable = true;
 
-    protected bool | Closure $isConfirmable = false;
+    protected bool|Closure $isConfirmable = false;
 
     protected ?Closure $modifyClearActionUsing = null;
 
@@ -47,10 +47,7 @@ trait HasActions
             ]) ?? $action;
         }
 
-        $action->extraAttributes([
-            'x-on:click' => 'clear',
-            ...$action->getExtraAttributes(),
-        ]);
+        $action->alpineClickHandler('clear');
 
         return $action;
     }
@@ -92,10 +89,7 @@ trait HasActions
             ]) ?? $action;
         }
 
-        $action->extraAttributes([
-            'x-on:click' => 'undo',
-            ...$action->getExtraAttributes(),
-        ]);
+        $action->alpineClickHandler('undo');
 
         return $action;
     }
@@ -117,8 +111,9 @@ trait HasActions
             ]) ?? $action;
         }
 
+        $action->alpineClickHandler('done');
+
         $action->extraAttributes([
-            'x-on:click' => 'done',
             'x-cloak' => '',
             'x-show' => new HtmlString('dirty && !confirmed'),
             ...$action->getExtraAttributes(),
@@ -134,44 +129,48 @@ trait HasActions
         return $this;
     }
 
-    public function clearable(bool | Closure $condition = true): static
+    public function clearable(bool|Closure $condition = true): static
     {
         $this->isClearable = $condition;
 
         return $this;
     }
 
-    public function downloadable(bool | Closure $condition = true): static
+    public function downloadable(bool|Closure $condition = true): static
     {
         $this->isDownloadable = $condition;
 
         return $this;
     }
 
-    public function downloadableFormats(array | Closure $formats): static
+    public function downloadableFormats(array|Closure $formats): static
     {
         $this->downloadableFormats = $formats;
 
         return $this;
     }
 
-    public function downloadActionDropdownPlacement(string | Closure $placement): static
+    public function downloadActionDropdownPlacement(string|Closure $placement): static
     {
         $this->downloadActionDropdownPlacement = $placement;
 
         return $this;
     }
 
-    public function undoable(bool | Closure $condition = true): static
+    public function undoable(bool|Closure $condition = true): static
     {
         $this->isUndoable = $condition;
 
         return $this;
     }
 
-    public function confirmable(bool | Closure $condition = true): static
+    public function confirmable(bool|Closure $condition = true, bool $shouldMakeComponentRequired = true): static
     {
         $this->isConfirmable = $condition;
+
+        if ($shouldMakeComponentRequired) {
+            $this->required();
+        }
 
         return $this;
     }
