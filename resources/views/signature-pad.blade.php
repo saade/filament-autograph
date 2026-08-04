@@ -24,6 +24,7 @@
     @endphp
 
     <div
+        wire:ignore
         @if (FilamentView::hasSpaMode())
             {{-- format-ignore-start --}}x-load="visible || event (ax-modal-opened)"{{-- format-ignore-end --}}
         @else
