@@ -1,9 +1,15 @@
 {
     "name": "saade/filament-autograph",
-    "description": "A Filament package to manage signatures.",
+    "description": "A signature pad field for Filament forms.",
     "keywords": [
         "saade",
         "laravel",
+        "filament",
+        "filamentphp",
+        "filament-plugin",
+        "signature",
+        "signature-pad",
+        "e-signature",
         "filament-autograph"
     ],
     "homepage": "https://github.com/saade/filament-autograph",
@@ -20,19 +26,20 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "filament/filament": "^4.0|^5.0",
         "filament/forms": "^4.0|^5.0",
         "spatie/laravel-package-tools": "^1.15.0"
     },
     "require-dev": {
+        "larastan/larastan": "^3.0",
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^8.0",
-        "nunomaduro/larastan": "^3.0",
-        "orchestra/testbench": "^9.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-arch": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^3.7|^4.0",
+        "pestphp/pest-plugin-arch": "^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+        "pestphp/pest-plugin-livewire": "^3.0|^4.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
@@ -40,8 +47,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saade\\FilamentAutograph\\": "src/",
-            "Saade\\FilamentAutograph\\Database\\Factories\\": "database/factories/"
+            "Saade\\FilamentAutograph\\": "src/"
         }
     },
     "autoload-dev": {
@@ -51,10 +57,11 @@
     },
     "scripts": {
         "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
-        "analyse": "vendor/bin/phpstan analyse",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+        "analyse": "phpstan analyse",
+        "lint": "pint",
+        "test": "pest",
+        "test:coverage": "pest --coverage",
+        "test:lint": "pint --test"
     },
     "config": {
         "sort-packages": true,
@@ -67,10 +74,7 @@
         "laravel": {
             "providers": [
                 "Saade\\FilamentAutograph\\FilamentAutographServiceProvider"
-            ],
-            "aliases": {
-                "FilamentAutograph": "Saade\\FilamentAutograph\\Facades\\FilamentAutograph"
-            }
+            ]
         }
     },
     "minimum-stability": "dev",
