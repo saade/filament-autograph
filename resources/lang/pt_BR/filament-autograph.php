@@ -17,11 +17,11 @@ return [
                 'png' => 'PNG',
                 'jpg' => 'JPG',
                 'svg' => 'SVG',
-            ]
+            ],
         ],
 
         'done' => [
             'label' => 'Concluir',
         ],
-    ]
+    ],
 ];
