@@ -40,6 +40,8 @@ export default function signaturePadFormComponent({
 
         hasLoadedImage: false,
 
+        isDark: false,
+
         init() {
             this.signaturePad = new SignaturePad(this.$refs.canvas, {
                 backgroundColor,
@@ -372,6 +374,8 @@ export default function signaturePadFormComponent({
          * @param {'dark'|'light'} theme
          */
         onThemeChanged(theme) {
+            this.isDark = theme === 'dark'
+
             this.signaturePad.penColor =
                 theme === 'dark' ? penColorOnDark ?? penColor : penColor
             this.signaturePad.backgroundColor =

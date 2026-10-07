@@ -94,7 +94,7 @@ SignaturePad::make('signature')
     ->backgroundColorOnDark('#f0a')     // Background color on dark mode (defaults to backgroundColor)
     ->exportBackgroundColor('#f00')     // Background color of the saved signature (defaults to backgroundColor, in light and dark mode)
     ->penColor('#000')                  // Pen color on light mode
-    ->penColorOnDark('#fff')            // Pen color on dark mode (defaults to penColor)
+    ->penColorOnDark('#fff')            // Pen color on dark mode (defaults to white, whatever penColor is)
     ->exportPenColor('#0f0')            // Pen color of the saved signature (defaults to penColor, in light and dark mode)
 ```
 

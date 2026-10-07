@@ -52,10 +52,15 @@
             id="{{ $getId() }}"
             role="img"
             aria-label="{{ strip_tags((string) $getLabel()) }}"
+            {{-- Tailwind's `dark:` variant follows the browser unless the application's stylesheet is set up otherwise, which can disagree with the theme the pad draws in. --}}
+            x-bind:class="{
+                'border-gray-300': ! isDark,
+                'bg-gray-900 border-white/10': isDark,
+                'bg-gray-50': ! isDark && @js($isDisabled),
+            }"
             @class([
-                'w-full h-36 rounded-lg border border-gray-300',
-                'dark:bg-gray-900 dark:border-white/10',
-                'opacity-75 bg-gray-50' => $isDisabled,
+                'w-full h-36 rounded-lg border',
+                'opacity-75' => $isDisabled,
             ])
         ></canvas>
 

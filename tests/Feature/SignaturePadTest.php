@@ -134,3 +134,9 @@ it('gives the canvas the id its label points at, and a name for assistive techno
     signatureForm(fn (SignaturePad $field) => $field->label('Customer signature'))
         ->assertSeeHtml(['role="img"', 'aria-label="Customer signature"', 'id="form.signature"']);
 });
+
+it('styles the canvas from the theme the pad draws in, not from the browser', function () {
+    signatureForm()
+        ->assertSeeHtml(["'bg-gray-900 border-white/10': isDark", "'border-gray-300': ! isDark"])
+        ->assertDontSeeHtml('dark:');
+});
