@@ -8,6 +8,6 @@
     "devDependencies": {
         "esbuild": "^0.28.2",
         "prettier": "^3.5.3",
-        "signature_pad": "^4.1.6"
+        "signature_pad": "^5.1.4"
     }
 }
