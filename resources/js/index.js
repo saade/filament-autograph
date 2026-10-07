@@ -21,7 +21,7 @@ export default function signaturePadFormComponent({
 }) {
     return {
         state,
-        previousState: state,
+        writtenState: undefined,
         dirty: false,
         confirmed: false,
 
@@ -80,6 +80,10 @@ export default function signaturePadFormComponent({
                 this.$refs.canvas.addEventListener(
                     'pointerdown',
                     () => {
+                        if (!this.hasLoadedImage) {
+                            return
+                        }
+
                         this.hasLoadedImage = false
                         this.signaturePad.clear()
                     },
@@ -126,12 +130,17 @@ export default function signaturePadFormComponent({
             this.resolutionQuery?.removeEventListener('change', this.onResize)
             window.removeEventListener('resize', this.onResize)
             this.schemeQuery?.removeEventListener('change', this.onSchemeChange)
+            this.signaturePad?.off()
         },
 
         clear() {
+            this.reset()
+            this.setState(null)
+        },
+
+        reset() {
             this.hasLoadedImage = false
             this.signaturePad.clear()
-            this.state = null
             this.confirmed = false
             this.dirty = false
 
@@ -158,7 +167,7 @@ export default function signaturePadFormComponent({
             }
 
             if (!data.length) {
-                this.state = null
+                this.setState(null)
             } else if (!confirmable) {
                 this.done()
             }
@@ -176,8 +185,7 @@ export default function signaturePadFormComponent({
             } = this.prepareToExport()
             this.signaturePad.fromData(exportedData)
 
-            this.previousState = this.state
-            this.state = this.signaturePad.toDataURL()
+            this.setState(this.signaturePad.toDataURL())
 
             if (confirmable) {
                 this.confirmed = true
@@ -243,9 +251,31 @@ export default function signaturePadFormComponent({
 
             this.$watch('confirmed', (confirmed) => {
                 if (confirmable && !confirmed) {
-                    this.state = null
+                    this.setState(null)
                 }
             })
+
+            // A value the pad did not write itself came from the server: a
+            // `$set()`, a form reset, "create another".
+            this.$watch('state', (value) => {
+                if (value === this.writtenState) {
+                    return
+                }
+
+                this.writtenState = value
+
+                if (value) {
+                    this.signaturePad.clear()
+                    this.loadImage(value)
+                } else {
+                    this.reset()
+                }
+            })
+        },
+
+        setState(value) {
+            this.writtenState = value
+            this.state = value
         },
 
         // The canvas is watched itself, and not only the window, because its

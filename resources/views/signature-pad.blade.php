@@ -23,6 +23,7 @@
 
     <div
         wire:ignore
+        wire:key="{{ $getLivewireKey() }}.{{ md5(serialize([$isDisabled, $isClearable, $isConfirmable])) }}"
         x-load
         x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-autograph-alpine', 'saade/filament-autograph') }}"
         x-data="signaturePadFormComponent({

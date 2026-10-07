@@ -95,3 +95,15 @@ it('tells the browser whether a saved signature can be cleared', function () {
 
     signatureForm(fn (SignaturePad $field) => $field->clearable(false))->assertSeeHtml('clearable: false');
 });
+
+it('keys the pad so that it is built again when an option that shapes it changes', function () {
+    $enabled = signatureForm()->html();
+    $disabled = signatureForm(fn (SignaturePad $field) => $field->disabled())->html();
+
+    preg_match('/wire:key="([^"]+)"[^>]*x-load/s', $enabled, $enabledKey);
+    preg_match('/wire:key="([^"]+)"[^>]*x-load/s', $disabled, $disabledKey);
+
+    expect($enabledKey[1] ?? null)->not->toBeNull()
+        ->and($disabledKey[1] ?? null)->not->toBeNull()
+        ->and($enabledKey[1])->not->toBe($disabledKey[1]);
+});
