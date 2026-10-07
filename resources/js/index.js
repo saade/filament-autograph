@@ -27,6 +27,14 @@ export default function signaturePadFormComponent({
         /** @type {SignaturePad} */
         signaturePad: null,
 
+        resizeObserver: null,
+
+        resolutionQuery: null,
+
+        onResize: null,
+
+        hasLoadedImage: false,
+
         init() {
             this.signaturePad = new SignaturePad(this.$refs.canvas, {
                 backgroundColor,
@@ -48,11 +56,13 @@ export default function signaturePadFormComponent({
             this.watchTheme()
 
             if (state.initialValue) {
+                this.hasLoadedImage = true
                 this.signaturePad.fromDataURL(state.initialValue)
 
                 this.signaturePad.addEventListener(
                     'beginStroke',
                     () => {
+                        this.hasLoadedImage = false
                         this.signaturePad.clear()
                     },
                     { once: true },
@@ -60,7 +70,14 @@ export default function signaturePadFormComponent({
             }
         },
 
+        destroy() {
+            this.resizeObserver?.disconnect()
+            this.resolutionQuery?.removeEventListener('change', this.onResize)
+            window.removeEventListener('resize', this.onResize)
+        },
+
         clear() {
+            this.hasLoadedImage = false
             this.signaturePad.clear()
             this.state = null
             this.confirmed = false
@@ -153,21 +170,56 @@ export default function signaturePadFormComponent({
             })
         },
 
+        // The canvas is watched itself, and not only the window, because its
+        // box also changes when a modal opens, a tab is shown or a sidebar
+        // collapses. A change of screen changes the pixel ratio without
+        // changing the box, which the observer does not see.
         watchResize() {
-            window.addEventListener('resize', () => this.resizeCanvas)
+            this.onResize = () => this.resizeCanvas()
+
+            this.resizeObserver = new ResizeObserver(this.onResize)
+            this.resizeObserver.observe(this.$refs.canvas)
+
+            window.addEventListener('resize', this.onResize)
+
+            this.resolutionQuery = window.matchMedia(
+                `(resolution: ${window.devicePixelRatio || 1}dppx)`,
+            )
+            this.resolutionQuery.addEventListener('change', this.onResize)
+
             this.resizeCanvas()
         },
 
-        /**
-         * To correctly handle canvas on low and high DPI screens one has to take devicePixelRatio into account and scale the canvas accordingly.
-         */
+        // Resizing a canvas erases it, so what was drawn is put back: the
+        // strokes from their points, or the loaded signature from the state.
         resizeCanvas() {
+            const canvas = this.$refs.canvas
             const ratio = Math.max(window.devicePixelRatio || 1, 1)
+            const width = Math.round(canvas.offsetWidth * ratio)
+            const height = Math.round(canvas.offsetHeight * ratio)
 
-            this.$refs.canvas.width = this.$refs.canvas.offsetWidth * ratio
-            this.$refs.canvas.height = this.$refs.canvas.offsetHeight * ratio
-            this.$refs.canvas.getContext('2d').scale(ratio, ratio)
+            // Hidden, as in a closed modal or an inactive tab.
+            if (!width || !height) {
+                return
+            }
+
+            if (canvas.width === width && canvas.height === height) {
+                return
+            }
+
+            const data = this.signaturePad.toData()
+
+            canvas.width = width
+            canvas.height = height
+            canvas.getContext('2d').scale(ratio, ratio)
+
             this.signaturePad.clear()
+
+            if (data.length) {
+                this.signaturePad.fromData(data)
+            } else if (this.hasLoadedImage && this.state) {
+                this.signaturePad.fromDataURL(this.state)
+            }
         },
 
         watchTheme() {

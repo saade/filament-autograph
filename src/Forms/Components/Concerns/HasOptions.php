@@ -170,9 +170,7 @@ trait HasOptions
     }
 
     /**
-     * Strategy used to load the signature pad.
-     * If you notice that the signature pad is not loading correctly in modals, consider changing this value to "idle".
-     * See https://async-alpine.dev/docs/strategies/ for more details.
+     * @deprecated Has no effect and will be removed in 5.x. The pad sizes itself whenever it becomes visible, so it no longer needs a loading strategy.
      */
     public function loadStrategy(string | Closure | null $loadStrategy): static
     {
@@ -241,6 +239,9 @@ trait HasOptions
         return $this->evaluate($this->velocityFilterWeight);
     }
 
+    /**
+     * @deprecated Will be removed in 5.x.
+     */
     public function getLoadStrategy(): string
     {
         return $this->evaluate($this->loadStrategy);

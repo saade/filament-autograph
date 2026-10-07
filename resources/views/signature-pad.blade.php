@@ -1,5 +1,4 @@
 @php
-    use Filament\Support\Facades\FilamentView;
     use Saade\FilamentAutograph\Forms\Components\Enums\DownloadableFormat;
 @endphp
 
@@ -15,7 +14,6 @@
         $downloadActionDropdownPlacement = $getDownloadActionDropdownPlacement() ?? 'bottom-start';
         $isUndoable = $isUndoable();
         $isConfirmable = $isConfirmable();
-        $loadStrategy = $getLoadStrategy();
 
         $clearAction = $getAction('clear');
         $downloadAction = $getAction('download');
@@ -25,11 +23,7 @@
 
     <div
         wire:ignore
-        @if (FilamentView::hasSpaMode())
-            {{-- format-ignore-start --}}x-load="visible || event (ax-modal-opened)"{{-- format-ignore-end --}}
-        @else
-            x-load
-        @endif
+        x-load
         x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-autograph-alpine', 'saade/filament-autograph') }}"
         x-data="signaturePadFormComponent({
             backgroundColor: @js($getBackgroundColor()),

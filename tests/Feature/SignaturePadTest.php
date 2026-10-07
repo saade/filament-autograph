@@ -77,3 +77,15 @@ it('has its labels in every language it ships', function (string $locale) {
         expect(__("filament-autograph::filament-autograph.{$key}"))->not->toStartWith('filament-autograph::');
     }
 })->with(['en', 'pt_BR']);
+
+it('loads the pad without waiting for it to be visible or for a modal event', function () {
+    signatureForm()
+        ->assertSeeHtml('x-load')
+        ->assertDontSeeHtml(['ax-modal-opened', 'x-load="visible']);
+});
+
+it('still accepts a load strategy, which no longer does anything', function () {
+    signatureForm(fn (SignaturePad $field) => $field->loadStrategy('idle'))
+        ->assertOk()
+        ->assertDontSeeHtml('x-load="idle"');
+});
