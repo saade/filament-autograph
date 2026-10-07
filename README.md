@@ -4,7 +4,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/saade/filament-autograph.svg?style=flat-square)](https://packagist.org/packages/saade/filament-autograph)
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/saade/filament-autograph/3.x/art/cover.png" alt="Banner" style="width: 100%; max-width: 800px; border-radius: 10px" />
+    <img src="https://raw.githubusercontent.com/saade/filament-autograph/4.x/art/cover.png" alt="Banner" style="width: 100%; max-width: 800px; border-radius: 10px" />
 </p>
 
 ## Installation
@@ -17,7 +17,7 @@ composer require saade/filament-autograph
 
 #### 2. Setup the plugin styles:
 > [!IMPORTANT]
-> If you have not set up a custom theme and are using Filament Panels follow the instructions in the [Filament Docs](https://filamentphp.com/docs/4.x/styling/overview#creating-a-custom-theme) first.
+> If you have not set up a custom theme and are using Filament Panels follow the instructions in the [Filament Docs](https://filamentphp.com/docs/5.x/styling/overview#creating-a-custom-theme) first.
 
 After setting up a custom theme add the plugin's views to your theme css file or your app's css file if using the standalone packages.
 
@@ -32,6 +32,42 @@ use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 
 SignaturePad::make('signature')
 ```
+
+### What is saved
+
+The state of the field is the signature as a PNG [data URL](https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data): a string that starts with `data:image/png;base64,`. It is usually tens of kilobytes and grows with the size of the pad and the density of the screen, so store it in a `longText` column, not a `string`:
+
+```php
+$table->longText('signature')->nullable();
+```
+
+The signature is saved in the light-mode pen and background colors, whatever theme the person signing uses, so it reads the same everywhere. Change that with `exportPenColor()` and `exportBackgroundColor()`.
+
+Like any field, it can be required:
+
+```php
+SignaturePad::make('signature')
+    ->required()
+```
+
+### Editing a saved signature
+
+When the field is filled with a signature that was saved before, it shows that signature and stays locked until the user clears it. This keeps a stray touch on an edit page from replacing it. A pad with `clearable(false)` cannot be cleared, so there the first stroke replaces the saved signature.
+
+### Showing a saved signature
+
+Filament's own image components display a data URL, so a saved signature needs nothing from this package:
+
+```php
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Tables\Columns\ImageColumn;
+
+ImageEntry::make('signature')
+
+ImageColumn::make('signature')
+```
+
+The saved background is transparent by default, with a dark pen. To keep it readable in dark mode, save it on white with `->exportBackgroundColor('#fff')`, or give the image a white background where you show it.
 
 ## Configuration
 ### SignaturePad options.
@@ -75,7 +111,7 @@ SignaturePad::make('signature')
         DownloadableFormat::JPG,
         DownloadableFormat::SVG,
     ])
-    ->downloadActionDropdownPlacement('center-end')     // Dropdown placement of the download action (defaults to 'bottom-end')
+    ->downloadActionDropdownPlacement('center-end')     // Dropdown placement of the download action (defaults to 'bottom-start')
 ```
 
 ### Disabling clear, download, undo and done actions.
@@ -95,16 +131,23 @@ SignaturePad::make('signature')
     ->confirmable()                 // Requires user to click on 'Done' (defaults to false)
 ```
 
+A confirmable pad is also made required. Pass `shouldMakeComponentRequired: false` to keep it optional:
+
+```php
+SignaturePad::make('signature')
+    ->confirmable(shouldMakeComponentRequired: false)
+```
+
 ### Customizing actions
 ```php
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
-use Filament\Forms\Actions\Action;
+use Filament\Actions\Action;
 
 SignaturePad::make('signature')
     ->clearAction(fn (Action $action) => $action->button())
     ->downloadAction(fn (Action $action) => $action->color('primary'))
-    ->undoAction(fn (Action $action) => $action->icon('heroicon-o-ctrl-z'))
-    ->doneAction(fn (Action $action) => $action->iconButton()->icon('heroicon-o-thumbs-up'))
+    ->undoAction(fn (Action $action) => $action->icon('heroicon-o-arrow-uturn-left'))
+    ->doneAction(fn (Action $action) => $action->iconButton()->icon('heroicon-o-hand-thumb-up'))
 ```
 ## Changelog
 
@@ -129,6 +172,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 <p align="center">
     <a href="https://github.com/sponsors/saade">
-        <img src="https://raw.githubusercontent.com/saade/filament-autograph/3.x/art/sponsor.png" alt="Sponsor Saade" style="width: 100%; max-width: 800px;" />
+        <img src="https://raw.githubusercontent.com/saade/filament-autograph/4.x/art/sponsor.png" alt="Sponsor Saade" style="width: 100%; max-width: 800px;" />
     </a>
 </p>
