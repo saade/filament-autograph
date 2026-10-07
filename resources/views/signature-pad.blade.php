@@ -35,7 +35,7 @@
             dotSize: {{ $getDotSize() }},
             exportBackgroundColor: @js($getExportBackgroundColor()),
             exportPenColor: @js($getExportPenColor()),
-            filename: '{{ $getFilename() }}',
+            filename: @js($getFilename()),
             maxWidth: {{ $getLineMaxWidth() }},
             minDistance: {{ $getMinDistance() }},
             minWidth: {{ $getLineMinWidth() }},
@@ -49,6 +49,9 @@
         <canvas
             x-ref="canvas"
             wire:ignore
+            id="{{ $getId() }}"
+            role="img"
+            aria-label="{{ strip_tags((string) $getLabel()) }}"
             @class([
                 'w-full h-36 rounded-lg border border-gray-300',
                 'dark:bg-gray-900 dark:border-white/10',

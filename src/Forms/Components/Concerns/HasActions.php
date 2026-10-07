@@ -168,7 +168,7 @@ trait HasActions
     {
         $this->isConfirmable = $condition;
 
-        if ($shouldMakeComponentRequired) {
+        if ($shouldMakeComponentRequired && ($condition !== false)) {
             $this->required();
         }
 

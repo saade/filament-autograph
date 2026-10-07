@@ -21,7 +21,7 @@ enum DownloadableFormat: string
     {
         return match ($this) {
             self::PNG => 'image/png',
-            self::JPG => 'image/jpg',
+            self::JPG => 'image/jpeg',
             self::SVG => 'image/svg+xml',
         };
     }

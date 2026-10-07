@@ -202,12 +202,7 @@ export default function signaturePadFormComponent({
 
         downloadAs(type, extension) {
             if (this.hasLoadedImage) {
-                this.download(
-                    this.signaturePad.toDataURL(type, {
-                        includeBackgroundColor: true,
-                    }),
-                    `${filename}.${extension}`,
-                )
+                this.download(this.toDataURL(type), `${filename}.${extension}`)
 
                 return
             }
@@ -219,12 +214,7 @@ export default function signaturePadFormComponent({
             } = this.prepareToExport()
             this.signaturePad.fromData(exportedData)
 
-            this.download(
-                this.signaturePad.toDataURL(type, {
-                    includeBackgroundColor: true,
-                }),
-                `${filename}.${extension}`,
-            )
+            this.download(this.toDataURL(type), `${filename}.${extension}`)
 
             const { data: restoredData } = this.restoreFromExport(
                 exportedData,
@@ -232,6 +222,27 @@ export default function signaturePadFormComponent({
                 canvasPenColor,
             )
             this.signaturePad.fromData(restoredData)
+        },
+
+        // JPEG has no transparency: whatever is transparent on the pad would
+        // come out black, so it is put on white first.
+        toDataURL(type) {
+            if (type !== 'image/jpeg') {
+                return this.signaturePad.toDataURL(type, {
+                    includeBackgroundColor: true,
+                })
+            }
+
+            const canvas = document.createElement('canvas')
+            canvas.width = this.$refs.canvas.width
+            canvas.height = this.$refs.canvas.height
+
+            const context = canvas.getContext('2d')
+            context.fillStyle = '#ffffff'
+            context.fillRect(0, 0, canvas.width, canvas.height)
+            context.drawImage(this.$refs.canvas, 0, 0)
+
+            return canvas.toDataURL(type)
         },
 
         watchState() {

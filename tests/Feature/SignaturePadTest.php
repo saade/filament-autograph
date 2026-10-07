@@ -107,3 +107,30 @@ it('keys the pad so that it is built again when an option that shapes it changes
         ->and($disabledKey[1] ?? null)->not->toBeNull()
         ->and($enabledKey[1])->not->toBe($disabledKey[1]);
 });
+
+it('makes a confirmable pad required, and leaves one that is not confirmable alone', function () {
+    $isRequired = fn (?Closure $configureUsing): bool => signatureForm($configureUsing)->instance()->form->getFlatFields()['signature']->isRequired();
+
+    expect($isRequired(fn (SignaturePad $field) => $field->confirmable()))->toBeTrue()
+        ->and($isRequired(fn (SignaturePad $field) => $field->confirmable(false)))->toBeFalse()
+        ->and($isRequired(fn (SignaturePad $field) => $field->required()->confirmable(false)))->toBeTrue()
+        ->and($isRequired(fn (SignaturePad $field) => $field->confirmable(shouldMakeComponentRequired: false)))->toBeFalse();
+});
+
+it('survives a filename with a quote in it', function () {
+    signatureForm(fn (SignaturePad $field) => $field->filename("O'Brien"))
+        ->assertOk()
+        ->assertDontSeeHtml("filename: 'O'Brien'")
+        ->assertSeeHtml('filename: ');
+});
+
+it('downloads a JPEG as a JPEG', function () {
+    signatureForm(fn (SignaturePad $field) => $field->downloadable())
+        ->assertSeeHtml("downloadAs('image/jpeg', 'jpg')")
+        ->assertDontSeeHtml('image/jpg');
+});
+
+it('gives the canvas the id its label points at, and a name for assistive technology', function () {
+    signatureForm(fn (SignaturePad $field) => $field->label('Customer signature'))
+        ->assertSeeHtml(['role="img"', 'aria-label="Customer signature"', 'id="form.signature"']);
+});
