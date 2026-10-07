@@ -28,6 +28,7 @@
         x-data="signaturePadFormComponent({
             backgroundColor: @js($getBackgroundColor()),
             backgroundColorOnDark: @js($getBackgroundColorOnDark()),
+            clearable: @js($isClearable),
             confirmable: @js($isConfirmable),
             disabled: @js($isDisabled),
             dotSize: {{ $getDotSize() }},

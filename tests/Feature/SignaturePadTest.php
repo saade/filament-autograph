@@ -89,3 +89,9 @@ it('still accepts a load strategy, which no longer does anything', function () {
         ->assertOk()
         ->assertDontSeeHtml('x-load="idle"');
 });
+
+it('tells the browser whether a saved signature can be cleared', function () {
+    signatureForm()->assertSeeHtml('clearable: true');
+
+    signatureForm(fn (SignaturePad $field) => $field->clearable(false))->assertSeeHtml('clearable: false');
+});

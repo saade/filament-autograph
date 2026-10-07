@@ -3,6 +3,7 @@ import SignaturePad from 'signature_pad'
 export default function signaturePadFormComponent({
     backgroundColor,
     backgroundColorOnDark,
+    clearable,
     confirmable,
     disabled,
     dotSize,
@@ -60,18 +61,64 @@ export default function signaturePadFormComponent({
             this.watchTheme()
 
             if (state.initialValue) {
-                this.hasLoadedImage = true
-                this.signaturePad.fromDataURL(state.initialValue)
+                this.loadImage(state.initialValue)
+            }
+        },
 
-                this.signaturePad.addEventListener(
-                    'beginStroke',
+        // A saved signature is only a picture, with no strokes to undo. It
+        // stays until cleared, so a stray touch on an edit page cannot replace
+        // it. A pad that cannot be cleared is replaced by the first stroke.
+        loadImage(dataUrl) {
+            this.hasLoadedImage = true
+            this.confirmed = true
+
+            if (clearable) {
+                this.signaturePad.off()
+            } else {
+                // Before the pad sees the press: clearing it from its own
+                // `beginStroke` event would drop the stroke being started.
+                this.$refs.canvas.addEventListener(
+                    'pointerdown',
                     () => {
                         this.hasLoadedImage = false
                         this.signaturePad.clear()
                     },
-                    { once: true },
+                    { once: true, capture: true },
                 )
             }
+
+            this.drawLoadedImage(dataUrl)
+        },
+
+        // Fitted inside the pad and centered, keeping its proportions, since
+        // it may have been signed on a pad of another size.
+        drawLoadedImage(dataUrl) {
+            const image = new Image()
+
+            image.onload = () => {
+                const canvas = this.$refs.canvas
+                const width = canvas.offsetWidth
+                const height = canvas.offsetHeight
+
+                if (!this.hasLoadedImage || !width || !height) {
+                    return
+                }
+
+                const scale = Math.min(
+                    width / image.width,
+                    height / image.height,
+                )
+
+                this.signaturePad.clear()
+                this.signaturePad.fromDataURL(dataUrl, {
+                    width: image.width * scale,
+                    height: image.height * scale,
+                    xOffset: (width - image.width * scale) / 2,
+                    yOffset: (height - image.height * scale) / 2,
+                })
+            }
+
+            image.src = dataUrl
         },
 
         destroy() {
@@ -87,26 +134,41 @@ export default function signaturePadFormComponent({
             this.state = null
             this.confirmed = false
             this.dirty = false
-            this.signaturePad.on()
+
+            if (!disabled) {
+                this.signaturePad.on()
+            }
         },
 
         undo() {
             const data = this.signaturePad.toData()
-            if (data.length) {
-                data.pop()
-                this.signaturePad.fromData(data)
+
+            if (!data.length) {
+                return
+            }
+
+            data.pop()
+            this.signaturePad.fromData(data)
+
+            this.confirmed = false
+            this.dirty = data.length > 0
+
+            if (!disabled) {
+                this.signaturePad.on()
             }
 
             if (!data.length) {
                 this.state = null
+            } else if (!confirmable) {
+                this.done()
             }
-
-            this.confirmed = false
-            this.dirty = data.length > 0
-            this.signaturePad.on()
         },
 
         done() {
+            if (!this.signaturePad.toData().length) {
+                return
+            }
+
             const {
                 data: exportedData,
                 canvasBackgroundColor,
@@ -131,6 +193,17 @@ export default function signaturePadFormComponent({
         },
 
         downloadAs(type, extension) {
+            if (this.hasLoadedImage) {
+                this.download(
+                    this.signaturePad.toDataURL(type, {
+                        includeBackgroundColor: true,
+                    }),
+                    `${filename}.${extension}`,
+                )
+
+                return
+            }
+
             const {
                 data: exportedData,
                 canvasBackgroundColor,
@@ -223,7 +296,7 @@ export default function signaturePadFormComponent({
             if (data.length) {
                 this.signaturePad.fromData(data)
             } else if (this.hasLoadedImage && this.state) {
-                this.signaturePad.fromDataURL(this.state)
+                this.drawLoadedImage(this.state)
             }
         },
 
