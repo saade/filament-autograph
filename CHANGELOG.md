@@ -2,6 +2,14 @@
 
 All notable changes to `filament-autograph` will be documented in this file.
 
+## v4.3.1 - 2026-10-07
+
+### Release Notes
+
+* fix: style the canvas from the pad's theme instead of the browser's dark mode in [`e2df4f2`](https://github.com/saade/filament-autograph/commit/e2df4f2d5ae7ce73cd4c56fd442035cdcff0f44a)
+
+**Full Changelog**: https://github.com/saade/filament-autograph/compare/v4.3.0..v4.4.0
+
 ## v4.3.0 - 2026-10-07
 
 ### Release Notes
