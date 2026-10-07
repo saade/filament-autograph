@@ -56,10 +56,10 @@ use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 SignaturePad::make('signature')
     ->backgroundColor('rgba(0,0,0,0)')  // Background color on light mode
     ->backgroundColorOnDark('#f0a')     // Background color on dark mode (defaults to backgroundColor)
-    ->exportBackgroundColor('#f00')     // Background color on export (defaults to backgroundColor)
+    ->exportBackgroundColor('#f00')     // Background color of the saved signature (defaults to backgroundColor, in light and dark mode)
     ->penColor('#000')                  // Pen color on light mode
     ->penColorOnDark('#fff')            // Pen color on dark mode (defaults to penColor)
-    ->exportPenColor('#0f0')            // Pen color on export (defaults to penColor)
+    ->exportPenColor('#0f0')            // Pen color of the saved signature (defaults to penColor, in light and dark mode)
 ```
 
 ### Allow download of the signature.

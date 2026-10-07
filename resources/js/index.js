@@ -33,6 +33,10 @@ export default function signaturePadFormComponent({
 
         onResize: null,
 
+        schemeQuery: null,
+
+        onSchemeChange: null,
+
         hasLoadedImage: false,
 
         init() {
@@ -74,6 +78,7 @@ export default function signaturePadFormComponent({
             this.resizeObserver?.disconnect()
             this.resolutionQuery?.removeEventListener('change', this.onResize)
             window.removeEventListener('resize', this.onResize)
+            this.schemeQuery?.removeEventListener('change', this.onSchemeChange)
         },
 
         clear() {
@@ -226,22 +231,23 @@ export default function signaturePadFormComponent({
             let theme
 
             if (this.$store.hasOwnProperty('theme')) {
-                window.addEventListener('theme-changed', (e) =>
-                    this.onThemeChanged(e.detail),
+                // The store always holds light or dark. The `theme-changed`
+                // event can also say "system", which is neither.
+                this.$watch('$store.theme', (theme) =>
+                    this.onThemeChanged(theme),
                 )
 
                 theme = this.$store.theme
             } else {
-                window
-                    .matchMedia('(prefers-color-scheme: dark)')
-                    .addEventListener('change', (e) =>
-                        this.onThemeChanged(e.matches ? 'dark' : 'light'),
-                    )
+                this.onSchemeChange = (e) =>
+                    this.onThemeChanged(e.matches ? 'dark' : 'light')
 
-                theme = window.matchMedia('(prefers-color-scheme: dark)')
-                    .matches
-                    ? 'dark'
-                    : 'light'
+                this.schemeQuery = window.matchMedia(
+                    '(prefers-color-scheme: dark)',
+                )
+                this.schemeQuery.addEventListener('change', this.onSchemeChange)
+
+                theme = this.schemeQuery.matches ? 'dark' : 'light'
             }
 
             this.onThemeChanged(theme)
@@ -284,10 +290,12 @@ export default function signaturePadFormComponent({
             const canvasBackgroundColor = this.signaturePad.backgroundColor
             const canvasPenColor = this.signaturePad.penColor
 
-            // Set export colors
+            // The saved signature must not depend on the theme of whoever
+            // signed, so it falls back to the light colors, never the ones on
+            // screen: white ink on a transparent background cannot be seen.
             this.signaturePad.backgroundColor =
-                exportBackgroundColor ?? this.signaturePad.backgroundColor
-            data.map((d) => (d.penColor = exportPenColor ?? d.penColor))
+                exportBackgroundColor ?? backgroundColor
+            data.map((d) => (d.penColor = exportPenColor ?? penColor))
 
             return {
                 data,
