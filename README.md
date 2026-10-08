@@ -33,6 +33,12 @@ use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 SignaturePad::make('signature')
 ```
 
+### Outside a panel
+
+The field works in any Livewire component that uses Filament's forms, not only in a panel. It needs what every Filament form needs there: Filament's styles and scripts in your layout, as described in the [Filament docs](https://filamentphp.com/docs/5.x/introduction/installation#installing-the-individual-components), and the `@source` line above in your app's CSS file.
+
+The pad is dark when the page is: it follows the `dark` class on the `<html>` element, like Filament's own components, and not the operating system's preference.
+
 ### What is saved
 
 The state of the field is the signature as a PNG [data URL](https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data): a string that starts with `data:image/png;base64,`. It is usually tens of kilobytes and grows with the size of the pad and the density of the screen, so store it in a `longText` column, not a `string`:

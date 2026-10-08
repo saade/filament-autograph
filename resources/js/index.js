@@ -34,9 +34,7 @@ export default function signaturePadFormComponent({
 
         onResize: null,
 
-        schemeQuery: null,
-
-        onSchemeChange: null,
+        themeObserver: null,
 
         hasLoadedImage: false,
 
@@ -131,7 +129,7 @@ export default function signaturePadFormComponent({
             this.resizeObserver?.disconnect()
             this.resolutionQuery?.removeEventListener('change', this.onResize)
             window.removeEventListener('resize', this.onResize)
-            this.schemeQuery?.removeEventListener('change', this.onSchemeChange)
+            this.themeObserver?.disconnect()
             this.signaturePad?.off()
         },
 
@@ -343,30 +341,24 @@ export default function signaturePadFormComponent({
             }
         },
 
+        // Not `prefers-color-scheme`: a light page on a dark system would get
+        // a dark pad with white ink.
         watchTheme() {
-            let theme
+            const root = document.documentElement
+            const theme = () =>
+                root.classList.contains('dark') ? 'dark' : 'light'
 
-            if (this.$store.hasOwnProperty('theme')) {
-                // The store always holds light or dark. The `theme-changed`
-                // event can also say "system", which is neither.
-                this.$watch('$store.theme', (theme) =>
-                    this.onThemeChanged(theme),
-                )
+            this.themeObserver = new MutationObserver(() => {
+                if ((theme() === 'dark') !== this.isDark) {
+                    this.onThemeChanged(theme())
+                }
+            })
+            this.themeObserver.observe(root, {
+                attributes: true,
+                attributeFilter: ['class'],
+            })
 
-                theme = this.$store.theme
-            } else {
-                this.onSchemeChange = (e) =>
-                    this.onThemeChanged(e.matches ? 'dark' : 'light')
-
-                this.schemeQuery = window.matchMedia(
-                    '(prefers-color-scheme: dark)',
-                )
-                this.schemeQuery.addEventListener('change', this.onSchemeChange)
-
-                theme = this.schemeQuery.matches ? 'dark' : 'light'
-            }
-
-            this.onThemeChanged(theme)
+            this.onThemeChanged(theme())
         },
 
         /**
