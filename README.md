@@ -2,6 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/saade/filament-autograph.svg?style=flat-square)](https://packagist.org/packages/saade/filament-autograph)
 [![Total Downloads](https://img.shields.io/packagist/dt/saade/filament-autograph.svg?style=flat-square)](https://packagist.org/packages/saade/filament-autograph)
+[![Plumb score](https://plumbphp.dev/badges/saade/filament-autograph/composite.svg)](https://plumbphp.dev/saade/filament-autograph)
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/saade/filament-autograph/4.x/art/cover.png" alt="Banner" style="width: 100%; max-width: 800px; border-radius: 10px" />
