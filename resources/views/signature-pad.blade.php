@@ -15,6 +15,12 @@
         $isUndoable = $isUndoable();
         $isConfirmable = $isConfirmable();
 
+        $canvasWidth = $getCanvasWidth();
+        $canvasHeight = $getCanvasHeight();
+        $hasFixedCanvasResolution = $canvasWidth !== null && $canvasHeight !== null;
+        $isCropSignatureEnabled = $isCropSignatureEnabled();
+        $cropPadding = $getCropPadding();
+
         $clearAction = $getAction('clear');
         $downloadAction = $getAction('download');
         $undoAction = $getAction('undo');
@@ -23,14 +29,18 @@
 
     <div
         wire:ignore
-        wire:key="{{ $getLivewireKey() }}.{{ md5(serialize([$isDisabled, $isClearable, $isConfirmable])) }}"
+        wire:key="{{ $getLivewireKey() }}.{{ md5(serialize([$isDisabled, $isClearable, $isConfirmable, $canvasWidth, $canvasHeight, $isCropSignatureEnabled, $cropPadding])) }}"
         x-load
         x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-autograph-alpine', 'saade/filament-autograph') }}"
         x-data="signaturePadFormComponent({
             backgroundColor: @js($getBackgroundColor()),
             backgroundColorOnDark: @js($getBackgroundColorOnDark()),
+            canvasHeight: @js($canvasHeight),
+            canvasWidth: @js($canvasWidth),
             clearable: @js($isClearable),
             confirmable: @js($isConfirmable),
+            cropPadding: {{ $cropPadding }},
+            cropSignature: @js($isCropSignatureEnabled),
             disabled: @js($isDisabled),
             dotSize: {{ $getDotSize() }},
             exportBackgroundColor: @js($getExportBackgroundColor()),
@@ -52,6 +62,12 @@
             id="{{ $getId() }}"
             role="img"
             aria-label="{{ strip_tags((string) $getLabel()) }}"
+            @if ($hasFixedCanvasResolution)
+                {{-- The backing store starts at the fixed resolution, and the element keeps its ratio, so the strokes are drawn on the full backing store whatever the screen. --}}
+                width="{{ $canvasWidth }}"
+                height="{{ $canvasHeight }}"
+                style="aspect-ratio: {{ $canvasWidth }} / {{ $canvasHeight }};"
+            @endif
             {{-- Tailwind's `dark:` variant follows the browser unless the application's stylesheet is set up otherwise, which can disagree with the theme the pad draws in. --}}
             x-bind:class="{
                 'border-gray-300': ! isDark,
@@ -59,7 +75,8 @@
                 'bg-gray-50': ! isDark && @js($isDisabled),
             }"
             @class([
-                'w-full h-36 rounded-lg border',
+                'w-full rounded-lg border',
+                'h-36' => ! $hasFixedCanvasResolution,
                 'opacity-75' => $isDisabled,
             ])
         ></canvas>

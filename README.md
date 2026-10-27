@@ -92,6 +92,28 @@ SignaturePad::make('signature')
     ->velocityFilterWeight(0.7)
 ```
 
+### Fixing the canvas resolution.
+By default, the canvas is sized to the on-screen element times the device pixel ratio, so the saved and the downloaded image are never larger than the visitor's screen. A fixed resolution pins the backing store instead, and the element is scaled by CSS to fit its box:
+```php
+use Saade\FilamentAutograph\Forms\Components\SignaturePad;
+
+SignaturePad::make('signature')
+    ->canvasWidth(1200)             // Width of the saved and the downloaded image, in pixels
+    ->canvasHeight(400)             // Height of the saved and the downloaded image, in pixels
+```
+
+### Cropping the saved signature to the ink.
+The saved and the downloaded image cover the full canvas, including the empty space around the signature. Cropping trims them to the bounds of the drawn signature:
+```php
+use Saade\FilamentAutograph\Forms\Components\SignaturePad;
+
+SignaturePad::make('signature')
+    ->cropSignature()               // Trim the saved and the downloaded image to the signature (defaults to false)
+    ->cropPadding(16)               // Padding kept around the signature bounds, in pixels (defaults to 8)
+```
+
+SVG downloads keep the full canvas: their export is vector paths, not canvas pixels.
+
 ### Customizing the pad background and pen color.
 ```php
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;

@@ -3,8 +3,12 @@ import SignaturePad from 'signature_pad'
 export default function signaturePadFormComponent({
     backgroundColor,
     backgroundColorOnDark,
+    canvasHeight,
+    canvasWidth,
     clearable,
     confirmable,
+    cropPadding,
+    cropSignature,
     disabled,
     dotSize,
     exportBackgroundColor,
@@ -185,7 +189,7 @@ export default function signaturePadFormComponent({
             } = this.prepareToExport()
             this.signaturePad.fromData(exportedData)
 
-            this.setState(this.signaturePad.toDataURL())
+            this.setState(this.toDataURL('image/png'))
 
             if (confirmable) {
                 this.confirmed = true
@@ -226,7 +230,20 @@ export default function signaturePadFormComponent({
 
         // JPEG has no transparency: whatever is transparent on the pad would
         // come out black, so it is put on white first.
+        //
+        // A cropped pad exports the bounds of its ink instead of the full
+        // canvas: SVG downloads pass through untouched, since their export
+        // is vector paths, not canvas pixels, and a pad without ink falls
+        // back to the full canvas.
         toDataURL(type) {
+            if (cropSignature && type !== 'image/svg+xml') {
+                const cropped = this.croppedDataURL(type)
+
+                if (cropped) {
+                    return cropped
+                }
+            }
+
             if (type !== 'image/jpeg') {
                 return this.signaturePad.toDataURL(type, {
                     includeBackgroundColor: true,
@@ -243,6 +260,100 @@ export default function signaturePadFormComponent({
             context.drawImage(this.$refs.canvas, 0, 0)
 
             return canvas.toDataURL(type)
+        },
+
+        // The bounds of the pixels that differ from the background, so a
+        // transparent or a solid background both crop correctly.
+        inkBounds() {
+            const canvas = this.$refs.canvas
+            const { width, height } = canvas
+
+            if (!width || !height) {
+                return null
+            }
+
+            const background = document.createElement('canvas')
+            background.width = 1
+            background.height = 1
+
+            const backgroundContext = background.getContext('2d')
+            backgroundContext.fillStyle = this.signaturePad.backgroundColor
+            backgroundContext.fillRect(0, 0, 1, 1)
+
+            const [
+                backgroundRed,
+                backgroundGreen,
+                backgroundBlue,
+                backgroundAlpha,
+            ] = backgroundContext.getImageData(0, 0, 1, 1).data
+
+            const pixels = canvas
+                .getContext('2d')
+                .getImageData(0, 0, width, height).data
+
+            let minX = width
+            let minY = height
+            let maxX = -1
+            let maxY = -1
+
+            for (let y = 0; y < height; y += 1) {
+                for (let x = 0; x < width; x += 1) {
+                    const i = (y * width + x) * 4
+
+                    if (
+                        pixels[i] !== backgroundRed ||
+                        pixels[i + 1] !== backgroundGreen ||
+                        pixels[i + 2] !== backgroundBlue ||
+                        pixels[i + 3] !== backgroundAlpha
+                    ) {
+                        minX = Math.min(minX, x)
+                        minY = Math.min(minY, y)
+                        maxX = Math.max(maxX, x)
+                        maxY = Math.max(maxY, y)
+                    }
+                }
+            }
+
+            if (maxX < 0) {
+                return null
+            }
+
+            return { minX, minY, maxX, maxY }
+        },
+
+        croppedDataURL(type) {
+            const bounds = this.inkBounds()
+
+            if (!bounds) {
+                return null
+            }
+
+            const canvas = this.$refs.canvas
+            const x = Math.max(0, bounds.minX - cropPadding)
+            const y = Math.max(0, bounds.minY - cropPadding)
+            const width =
+                Math.min(canvas.width, bounds.maxX + 1 + cropPadding) - x
+            const height =
+                Math.min(canvas.height, bounds.maxY + 1 + cropPadding) - y
+
+            if (width < 1 || height < 1) {
+                return null
+            }
+
+            const cropped = document.createElement('canvas')
+            cropped.width = width
+            cropped.height = height
+
+            const context = cropped.getContext('2d')
+
+            if (type === 'image/jpeg') {
+                context.fillStyle = '#ffffff'
+                context.fillRect(0, 0, width, height)
+            }
+
+            context.drawImage(canvas, x, y, width, height, 0, 0, width, height)
+
+            return cropped.toDataURL(type)
         },
 
         watchState() {
@@ -311,16 +422,29 @@ export default function signaturePadFormComponent({
 
         // Resizing a canvas erases it, so what was drawn is put back: the
         // strokes from their points, or the loaded signature from the state.
+        //
+        // A fixed resolution pins the backing store, so the saved and the
+        // downloaded image keep their size whatever the screen: the strokes
+        // are drawn on the full backing store, and the element itself is
+        // scaled by CSS to fit its box.
         resizeCanvas() {
             const canvas = this.$refs.canvas
-            const ratio = Math.max(window.devicePixelRatio || 1, 1)
-            const width = Math.round(canvas.offsetWidth * ratio)
-            const height = Math.round(canvas.offsetHeight * ratio)
+
+            const ratio =
+                canvasWidth && canvasHeight
+                    ? Math.min(
+                          canvasWidth / (canvas.offsetWidth || canvasWidth),
+                          canvasHeight / (canvas.offsetHeight || canvasHeight),
+                      )
+                    : Math.max(window.devicePixelRatio || 1, 1)
 
             // Hidden, as in a closed modal or an inactive tab.
-            if (!width || !height) {
+            if (!canvas.offsetWidth || !canvas.offsetHeight) {
                 return
             }
+
+            const width = Math.round(canvas.offsetWidth * ratio)
+            const height = Math.round(canvas.offsetHeight * ratio)
 
             if (canvas.width === width && canvas.height === height) {
                 return
@@ -369,10 +493,10 @@ export default function signaturePadFormComponent({
             this.isDark = theme === 'dark'
 
             this.signaturePad.penColor =
-                theme === 'dark' ? penColorOnDark ?? penColor : penColor
+                theme === 'dark' ? (penColorOnDark ?? penColor) : penColor
             this.signaturePad.backgroundColor =
                 theme === 'dark'
-                    ? backgroundColorOnDark ?? backgroundColor
+                    ? (backgroundColorOnDark ?? backgroundColor)
                     : backgroundColor
 
             if (!this.signaturePad.toData().length) {
@@ -383,10 +507,10 @@ export default function signaturePadFormComponent({
             const data = this.signaturePad.toData()
             data.map((d) => {
                 d.penColor =
-                    theme === 'dark' ? penColorOnDark ?? penColor : penColor
+                    theme === 'dark' ? (penColorOnDark ?? penColor) : penColor
                 d.backgroundColor =
                     theme === 'dark'
-                        ? backgroundColorOnDark ?? backgroundColor
+                        ? (backgroundColorOnDark ?? backgroundColor)
                         : backgroundColor
                 return d
             })

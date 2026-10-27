@@ -41,6 +41,51 @@ it('passes its options to the browser', function () {
         ]);
 });
 
+it('pins the canvas to a fixed resolution when it is given one', function () {
+    signatureForm(fn (SignaturePad $field) => $field
+        ->canvasWidth(1200)
+        ->canvasHeight(400))
+        ->assertSeeHtml([
+            // The canvas starts at the fixed resolution, keeping its ratio on
+            // the screen, so the strokes are drawn on the full backing store.
+            'width="1200"',
+            'height="400"',
+            'aspect-ratio: 1200 / 400',
+            // The pad is built again, so a resolution change rebuilds it.
+            'canvasWidth: 1200',
+            'canvasHeight: 400',
+        ])
+        ->assertDontSeeHtml('h-36');
+});
+
+it('sizes the canvas to the on-screen element without a fixed resolution', function () {
+    signatureForm()
+        ->assertSeeHtml([
+            'h-36',
+            'canvasWidth: null',
+            'canvasHeight: null',
+        ])
+        ->assertDontSeeHtml('aspect-ratio:');
+});
+
+it('crops the saved and downloaded image to the ink when it is asked to', function () {
+    signatureForm(fn (SignaturePad $field) => $field
+        ->cropSignature()
+        ->cropPadding(20))
+        ->assertSeeHtml([
+            'cropSignature: true',
+            'cropPadding: 20',
+        ]);
+});
+
+it('exports the full canvas by default', function () {
+    signatureForm()
+        ->assertSeeHtml([
+            'cropSignature: false',
+            'cropPadding: 8',
+        ]);
+});
+
 it('shows the clear and undo actions by default, and neither download nor done', function () {
     $field = signatureForm()->instance()->form->getFlatFields()['signature'];
 

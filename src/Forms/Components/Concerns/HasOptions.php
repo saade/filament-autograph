@@ -32,6 +32,14 @@ trait HasOptions
 
     protected float | Closure $velocityFilterWeight = 0.7;
 
+    protected int | Closure | null $canvasWidth = null;
+
+    protected int | Closure | null $canvasHeight = null;
+
+    protected bool | Closure $cropSignature = false;
+
+    protected int | Closure $cropPadding = 8;
+
     protected string | Closure $loadStrategy = 'visible';
 
     /**
@@ -170,6 +178,49 @@ trait HasOptions
     }
 
     /**
+     * Width of the canvas backing store, in pixels, and so of the saved and downloaded image.
+     * Null sizes the canvas to the on-screen element times `devicePixelRatio`.
+     */
+    public function canvasWidth(int | Closure | null $canvasWidth): static
+    {
+        $this->canvasWidth = $canvasWidth;
+
+        return $this;
+    }
+
+    /**
+     * Height of the canvas backing store, in pixels, and so of the saved and downloaded image.
+     * Null sizes the canvas to the on-screen element times `devicePixelRatio`.
+     */
+    public function canvasHeight(int | Closure | null $canvasHeight): static
+    {
+        $this->canvasHeight = $canvasHeight;
+
+        return $this;
+    }
+
+    /**
+     * Trim the saved and downloaded image to the bounds of the drawn signature,
+     * instead of exporting the full canvas.
+     */
+    public function cropSignature(bool | Closure $condition = true): static
+    {
+        $this->cropSignature = $condition;
+
+        return $this;
+    }
+
+    /**
+     * Padding kept around the signature bounds when cropping, in pixels.
+     */
+    public function cropPadding(int | Closure $padding): static
+    {
+        $this->cropPadding = $padding;
+
+        return $this;
+    }
+
+    /**
      * @deprecated Has no effect and will be removed in 5.x. The pad sizes itself whenever it becomes visible, so it no longer needs a loading strategy.
      */
     public function loadStrategy(string | Closure | null $loadStrategy): static
@@ -237,6 +288,26 @@ trait HasOptions
     public function getVelocityFilterWeight(): float
     {
         return $this->evaluate($this->velocityFilterWeight);
+    }
+
+    public function getCanvasWidth(): ?int
+    {
+        return $this->evaluate($this->canvasWidth);
+    }
+
+    public function getCanvasHeight(): ?int
+    {
+        return $this->evaluate($this->canvasHeight);
+    }
+
+    public function isCropSignatureEnabled(): bool
+    {
+        return (bool) $this->evaluate($this->cropSignature);
+    }
+
+    public function getCropPadding(): int
+    {
+        return (int) $this->evaluate($this->cropPadding);
     }
 
     /**
